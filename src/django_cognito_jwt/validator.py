@@ -2,6 +2,7 @@ import json
 
 import jwt
 import requests
+from pathlib import Path
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.functional import cached_property
@@ -39,8 +40,13 @@ class TokenValidator:
             raise TokenError(str(exc))
 
         if getattr(settings, "COGNITO_PUBLIC_KEYS_CACHING_ENABLED", False):
-            cache_key = "django_cognito_jwt:%s" % headers["kid"]
-            jwk_data = cache.get(cache_key)
+            if getattr(settings, "COGNITO_PUBLIC_KEYS_FILEPATH", False):
+                jwt_keys_filepath = Path(settings.COGNITO_PUBLIC_KEYS_FILEPATH)
+                assert jwt_keys_filepath.exists()
+                jwk_data = json.loads(jwt_keys_filepath.read_text(encoding="utf8"))
+            else:
+                cache_key = "django_cognito_jwt:%s" % headers["kid"]
+                jwk_data = cache.get(cache_key)
 
             if not jwk_data:
                 jwk_data = self._json_web_keys.get(headers["kid"])
@@ -65,6 +71,6 @@ class TokenValidator:
                 issuer=self.pool_url,
                 algorithms=["RS256"],
             )
-        except (jwt.InvalidTokenError, jwt.ExpiredSignature, jwt.DecodeError) as exc:
+        except (jwt.InvalidTokenError, jwt.ExpiredSignatureError, jwt.DecodeError) as exc:
             raise TokenError(str(exc))
         return jwt_data
