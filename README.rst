@@ -42,10 +42,18 @@ Add the following lines to your Django ``settings.py`` file:
 enable the ``COGNITO_PUBLIC_KEYS_CACHING_ENABLED`` setting (it only works if you
 have the Django ``CACHES`` setup to anything other than the dummy backend).
 
+(Optional) If you want to pre-package Cognito public keys as a json file enable ``COGNITO_PUBLIC_KEYS_CACHING_ENABLED`` and
+provide the relative file path to the JSON file in ``COGNITO_PUBLIC_KEYS_FILEPATH``.
+
 .. code-block:: python
 
     COGNITO_PUBLIC_KEYS_CACHING_ENABLED = True
+
+    # when using DJANGO caches
     COGNITO_PUBLIC_KEYS_CACHING_TIMEOUT = 60*60*24  # 24h caching, default is 300s
+
+    # when using pre-packaged file cache
+    COGNITO_PUBLIC_KEYS_FILEPATH = "./jwt.json"
 
 Also update the rest framework settings to use the correct authentication backend:
 
@@ -72,3 +80,25 @@ you can use the ``COGNITO_USER_MODEL`` setting.
 .. code-block:: python
 
 	COGNITO_USER_MODEL = "myproject.AppUser"
+
+Development
+=======================
+
+In order to develop for this package, and allow testing, install package in the development mode (via `python setup.py develop` or `pip install --editable`.
+
+Prepare Development environment
+........................................
+
+.. code-block:: bash
+
+    pipenv install --dev
+
+
+Run Tests
+.................
+
+.. code-block:: bash
+
+    pipenv shell
+    python setup.py develop
+    pytest -v

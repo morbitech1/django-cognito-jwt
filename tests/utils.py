@@ -4,7 +4,7 @@ import jwt
 from jwt.algorithms import RSAAlgorithm
 
 
-def create_jwt_token(private_key, payload):
+def create_jwt_token(private_key, payload) -> str:
     key = json.dumps(private_key)
     key_id = private_key["kid"]
 
