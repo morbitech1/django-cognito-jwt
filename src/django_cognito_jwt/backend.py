@@ -27,10 +27,9 @@ class JSONWebTokenAuthentication(BaseAuthentication):
             jwt_payload = token_validator.validate(jwt_token)
         except TokenError:
             raise exceptions.AuthenticationFailed()
-
         USER_MODEL = self.get_user_model()
-        user = USER_MODEL.objects.get_or_create_for_cognito(jwt_payload)
-        return (user, jwt_token)
+        user = USER_MODEL.objects.get_or_create_for_cognito(jwt_payload, jwt_token)
+        return user, jwt_token
 
     def get_user_model(self):
         user_model = getattr(settings, "COGNITO_USER_MODEL", settings.AUTH_USER_MODEL)
