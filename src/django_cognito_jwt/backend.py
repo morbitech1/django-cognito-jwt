@@ -1,9 +1,16 @@
 import logging
 
+from django import VERSION
 from django.apps import apps as django_apps
 from django.conf import settings
-from django.utils.encoding import smart_str
-from django.utils.translation import gettext as _
+
+if VERSION[0] >= 4:
+    from django.utils.encoding import smart_str
+    from django.utils.translation import gettext as _
+else:
+    from django.utils.encoding import smart_text as smart_str
+    from django.utils.translation import ugettext as _
+
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 
